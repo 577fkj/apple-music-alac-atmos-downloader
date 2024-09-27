@@ -1717,8 +1717,17 @@ func rip(albumId string, token string, storefront string, userToken string) erro
 			}
 			m4afilename := fmt.Sprintf("%s.m4a", forbiddenNames.ReplaceAllString(songName, "_"))
 			lrcFilename := fmt.Sprintf("%s.lrc", forbiddenNames.ReplaceAllString(songName, "_"))
-			trackPath := filepath.Join(sanAlbumFolder, filename)
-			m4atrackPath := filepath.Join(sanAlbumFolder, m4afilename)
+
+			albumName := LimitString(track.Attributes.AlbumName)
+			artistName := LimitString(track.Attributes.ArtistName)
+			saveAlbumFolder := filepath.Join(sanAlbumFolder, forbiddenNames.ReplaceAllString(artistName, "_"))
+			saveAlbumFolder = filepath.Join(saveAlbumFolder, forbiddenNames.ReplaceAllString(albumName, "_"))
+			fmt.Println("专辑文件夹:", saveAlbumFolder)
+
+			os.MkdirAll(saveAlbumFolder, os.ModePerm)
+
+			trackPath := filepath.Join(saveAlbumFolder, filename)
+			m4atrackPath := filepath.Join(saveAlbumFolder, m4afilename)
 			var lrc string = ""
 			if userToken != "your-media-user-token" && (config.EmbedLrc || config.SaveLrcFile) {
 				ttml, err := getSongLyrics(track.ID, storefront, token, userToken)
